@@ -4,6 +4,14 @@
 
 ![Magen Avatar](./assets/icon.png)
 
+## 📥 تحميل التطبيق
+
+[![Download APK](https://img.shields.io/badge/Download-APK-brightgreen?style=for-the-badge&logo=android)](https://github.com/magengillan00-lgtm/MagenAvatar/releases/download/v1.0.0/MagenAvatar-v1.0.0.apk)
+
+**حجم الملف:** ~5.5 MB  
+**الإصدار:** 1.0.0  
+**متوافق مع:** Android 7.0+ (مثل Honor 8X)
+
 ## المميزات ✨
 
 - 🎨 **شخصية أنمي تفاعلية**: شخصية "زيد" الأنمي مع رسوم متحركة طبيعية
@@ -11,10 +19,20 @@
 - 💬 **واجهة دردشة سهلة**: تجربة محادثة سلسة وجميلة
 - 🌙 **تصميم أنيق**: واجهة داكنة مريحة للعين
 - 📱 **متوافق مع جميع الأجهزة**: يعمل على أندرويد 7.0 وما فوق
+- 👤 **التعرف على المستخدم**: يتعرف تلقائياً على **ميجن غيلان**
+
+## طريقة التثبيت 📱
+
+1. **حمّل ملف APK** من الرابط أعلاه
+2. **فعّل التثبيت من مصادر غير معروفة**:
+   - اذهب إلى: الإعدادات → الأمان → مصادر غير معروفة
+   - أو عند التثبيت مباشرة: الإعدادات → السماح من هذا المصدر
+3. **افتح ملف APK** واتبع خطوات التثبيت
+4. **استمتع بالتحدث مع Zeed!** 🎉
 
 ## متطلبات التشغيل 📋
 
-- Node.js 18+
+- Node.js 18+ (للمطورين)
 - Android Studio (لبناء APK)
 - Android SDK 34
 - Java 17+
@@ -24,7 +42,7 @@
 ### 1. استنساخ المشروع
 
 ```bash
-git clone https://github.com/your-username/MagenAvatar.git
+git clone https://github.com/magengillan00-lgtm/MagenAvatar.git
 cd MagenAvatar
 ```
 
@@ -39,35 +57,6 @@ npm install
 ```bash
 # تشغيل على محاكي أو جهاز متصل
 npx expo run:android
-```
-
-### 4. بناء ملف APK
-
-#### الطريقة الأولى: استخدام EAS Build (الأسهل)
-
-```bash
-# تثبيت EAS CLI
-npm install -g eas-cli
-
-# تسجيل الدخول إلى Expo
-eas login
-
-# بناء APK
-eas build --platform android --profile preview
-```
-
-#### الطريقة الثانية: بناء محلي
-
-```bash
-# إنشاء ملفات Android الأصلية
-npx expo prebuild --platform android
-
-# بناء APK
-cd android
-./gradlew assembleRelease
-
-# ملف APK سيكون في:
-# android/app/build/outputs/apk/release/app-release.apk
 ```
 
 ## هيكل المشروع 📁
@@ -110,6 +99,7 @@ const GEMINI_API_KEY = 'YOUR_API_KEY_HERE';
 
 - **React Native** - إطار العمل الأساسي
 - **Expo** - منصة التطوير
+- **Capacitor** - تحويل الويب لتطبيق أصلي
 - **TypeScript** - لغة البرمجة
 - **Google Gemini AI** - الذكاء الاصطناعي
 - **React Native SVG** - الرسومات
