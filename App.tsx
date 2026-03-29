@@ -12,12 +12,13 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import * as Haptics from 'expo-haptics';
+import * as Speech from 'expo-speech';
 import Avatar from './src/components/Avatar';
 import ChatInterface from './src/components/ChatInterface';
 import { UserProvider, useUser } from './src/context/AppContext';
 import { sendMessage, initializeChat, getGreeting } from './src/services/geminiService';
 
-const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 interface Message {
   id: string;
@@ -34,42 +35,48 @@ const MainApp: React.FC = () => {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   useEffect(() => {
-    // Initialize chat with user name
     initializeChat(userName);
-    
-    // Add welcome message
+    const welcomeText = `${getGreeting()} ${userName}! 👋✨\n\nأنا زيد، صديقك الرقمي! سعيد جداً بالتحدث معك. كيف يمكنني مساعدتك اليوم؟`;
     const welcomeMessage: Message = {
       id: '1',
-      text: `${getGreeting()} ${userName}! 👋✨\n\nأنا زيد، صديقك الرقمي! سعيد جداً بالتحدث معك. كيف يمكنني مساعدتك اليوم؟`,
+      text: welcomeText,
       isUser: false,
       timestamp: new Date(),
     };
     setMessages([welcomeMessage]);
+    
+    // Speak welcome message
+    speak(welcomeText);
 
-    // Mark first launch as complete
     if (isFirstLaunch) {
       completeFirstLaunch();
     }
   }, []);
 
   useEffect(() => {
-    const keyboardWillShow = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
-      () => setKeyboardVisible(true)
-    );
-    const keyboardWillHide = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
-      () => setKeyboardVisible(false)
-    );
-
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const keyboardWillShow = Keyboard.addListener(showEvent, () => setKeyboardVisible(true));
+    const keyboardWillHide = Keyboard.addListener(hideEvent, () => setKeyboardVisible(false));
     return () => {
       keyboardWillShow.remove();
       keyboardWillHide.remove();
     };
   }, []);
 
+  const speak = (text: string) => {
+    const cleanText = text.replace(/[*_#]/g, ''); // Clean markdown
+    Speech.speak(cleanText, {
+      language: 'ar',
+      pitch: 1.1,
+      rate: 0.9,
+      onStart: () => setIsSpeaking(true),
+      onDone: () => setIsSpeaking(false),
+      onError: () => setIsSpeaking(false),
+    });
+  };
+
   const handleSendMessage = useCallback(async (text: string) => {
-    // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
       text,
@@ -77,22 +84,13 @@ const MainApp: React.FC = () => {
       timestamp: new Date(),
     };
     setMessages((prev) => [...prev, userMessage]);
-
-    // Haptic feedback
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
-    // Show typing indicator
     setIsTyping(true);
 
     try {
-      // Get AI response
       const response = await sendMessage(text);
-
-      // Simulate speaking animation
       setIsTyping(false);
-      setIsSpeaking(true);
-
-      // Add AI message
+      
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: response,
@@ -100,21 +98,12 @@ const MainApp: React.FC = () => {
         timestamp: new Date(),
       };
 
-      // Simulate speaking duration based on message length
-      const speakingDuration = Math.min(response.length * 30, 3000);
-      
-      setTimeout(() => {
-        setMessages((prev) => [...prev, aiMessage]);
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      }, 500);
-
-      setTimeout(() => {
-        setIsSpeaking(false);
-      }, speakingDuration);
+      setMessages((prev) => [...prev, aiMessage]);
+      speak(response);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     } catch (error) {
       setIsTyping(false);
       setIsSpeaking(false);
-      
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: 'عذراً، حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى! 🙏',
@@ -129,41 +118,27 @@ const MainApp: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <ExpoStatusBar style="light" />
       <LinearGradient
-        colors={['#1a1a2e', '#16213e', '#0f0f23']}
+        colors={['#0f172a', '#1e293b', '#0f172a']}
         style={styles.gradient}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
       >
-        {/* Background particles */}
-        <View style={styles.backgroundOverlay}>
-          <View style={[styles.particle, styles.particle1]} />
-          <View style={[styles.particle, styles.particle2]} />
-          <View style={[styles.particle, styles.particle3]} />
-        </View>
-
-        {/* Header */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Magen Avatar</Text>
-          <Text style={styles.headerSubtitle}>تحدث مع زيد ✨</Text>
+          <View style={styles.statusIndicator}>
+            <View style={[styles.statusDot, { backgroundColor: isSpeaking ? '#22c55e' : '#94a3b8' }]} />
+            <Text style={styles.statusText}>{isSpeaking ? 'يتحدث الآن...' : 'متصل'}</Text>
+          </View>
         </View>
 
-        {/* Avatar Section */}
         <View style={[styles.avatarSection, keyboardVisible && styles.avatarSectionSmall]}>
           <Avatar isSpeaking={isSpeaking} isThinking={isTyping} />
         </View>
 
-        {/* Chat Section */}
         <View style={styles.chatSection}>
           <ChatInterface
             messages={messages}
             onSendMessage={handleSendMessage}
             isTyping={isTyping}
           />
-        </View>
-
-        {/* User name badge */}
-        <View style={styles.userBadge}>
-          <Text style={styles.userBadgeText}>👤 {userName}</Text>
         </View>
       </LinearGradient>
     </SafeAreaView>
@@ -179,89 +154,32 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  gradient: {
-    flex: 1,
-  },
-  backgroundOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    overflow: 'hidden',
-  },
-  particle: {
-    position: 'absolute',
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: 'rgba(99, 102, 241, 0.1)',
-  },
-  particle1: {
-    top: '10%',
-    left: '10%',
-  },
-  particle2: {
-    top: '50%',
-    right: '5%',
-    width: 150,
-    height: 150,
-  },
-  particle3: {
-    bottom: '20%',
-    left: '5%',
-    width: 80,
-    height: 80,
-  },
+  container: { flex: 1, backgroundColor: '#0f172a' },
+  gradient: { flex: 1 },
   header: {
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight || 20 : 10,
+    paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 20) + 10 : 10,
     paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingBottom: 15,
     alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
   },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#fff',
-    letterSpacing: 1,
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.7)',
-    marginTop: 4,
-  },
-  avatarSection: {
-    height: SCREEN_HEIGHT * 0.35,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  avatarSectionSmall: {
-    height: SCREEN_HEIGHT * 0.2,
-  },
+  headerTitle: { fontSize: 22, fontWeight: '800', color: '#fff', letterSpacing: 1.5 },
+  statusIndicator: { flexDirection: 'row', alignItems: 'center', marginTop: 5 },
+  statusDot: { width: 8, height: 8, borderRadius: 4, marginRight: 6 },
+  statusText: { fontSize: 12, color: '#94a3b8' },
+  avatarSection: { height: SCREEN_HEIGHT * 0.4, justifyContent: 'center', alignItems: 'center' },
+  avatarSectionSmall: { height: SCREEN_HEIGHT * 0.25 },
   chatSection: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 35,
+    borderTopRightRadius: 35,
     overflow: 'hidden',
-  },
-  userBadge: {
-    position: 'absolute',
-    top: Platform.OS === 'android' ? (StatusBar.currentHeight || 20) + 50 : 60,
-    right: 15,
-    backgroundColor: 'rgba(99, 102, 241, 0.3)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: 'rgba(99, 102, 241, 0.4)',
-  },
-  userBadgeText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '500',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 15,
+    elevation: 10,
   },
 });
