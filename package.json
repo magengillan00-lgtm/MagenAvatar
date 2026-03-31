@@ -1,0 +1,33 @@
+{
+  "name": "magen-avatar",
+  "version": "1.0.0",
+  "description": "3D Anime AI Companion with Voice Chat",
+  "main": "index.js",
+  "scripts": {
+    "dev": "expo start --web",
+    "build": "expo build:web",
+    "start": "expo start",
+    "test": "jest"
+  },
+  "keywords": [
+    "avatar",
+    "3d",
+    "anime",
+    "ai",
+    "voice-chat",
+    "expo",
+    "react-native"
+  ],
+  "author": "Magen Avatar Team",
+  "license": "MIT",
+  "dependencies": {
+    "expo": "^54.0.0",
+    "react": "^19.0.0",
+    "react-native": "^0.81.0",
+    "three": "^0.183.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.183.0",
+    "typescript": "^5.9.0"
+  }
+}
