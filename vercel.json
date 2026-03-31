@@ -1,9 +1,8 @@
 {
-  "name": "magen-avatar",
-  "buildCommand": "pnpm build",
-  "devCommand": "pnpm dev",
-  "installCommand": "pnpm install",
-  "framework": "expo",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": null,
   "outputDirectory": "dist",
   "env": {
     "NODE_ENV": "production"
