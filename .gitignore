@@ -1,21 +1,54 @@
+# Dependencies
 node_modules/
-.pnp
-.pnp.js
-dist/
-build/
-.next/
+
+# Expo
 .expo/
-.expo-shared/
+dist/
+web-build/
+
+# Native builds
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# Debug
 npm-debug.*
 yarn-debug.*
 yarn-error.*
-.env
-.env.local
+
+# macOS
 .DS_Store
+*.pem
+
+# Local env files
+.env*.local
+.env
+
+# TypeScript
+*.tsbuildinfo
+
+# Testing
+coverage/
+
+# Android
+android/.gradle/
+android/app/build/
+android/build/
+*.apk
+*.aab
+
+# iOS
+ios/Pods/
+ios/build/
+
+# IDE
+.idea/
+.vscode/
 *.swp
 *.swo
-*~
-.vscode/
-.idea/
-Thumbs.db
-.vercel
