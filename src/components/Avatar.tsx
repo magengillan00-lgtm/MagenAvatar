@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, Animated, Easing, Dimensions, Platform } from 'react-native';
 import Svg, { Defs, LinearGradient, Stop, Ellipse, Path, Circle, Rect } from 'react-native-svg';
-import Rive, { RiveRef, StateMachineInput } from 'rive-react-native';
+import Rive, { RiveRef } from 'rive-react-native';
+
+const AnimatedPath = Animated.createAnimatedComponent(Path);
 
 const { width } = Dimensions.get('window');
 const AVATAR_SIZE = width * 0.75;
@@ -98,8 +100,8 @@ const Avatar: React.FC<AvatarProps> = ({ isSpeaking, isThinking, audioLevel = 0 
       <Svg width={AVATAR_SIZE} height={AVATAR_SIZE} viewBox="0 0 200 200">
         <Defs>
           <LinearGradient id="hairGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <Stop offset="0%" stopColor="#1a1a2e" />
-            <Stop offset="100%" stopColor="#16213e" />
+            <Stop offset="0%" stopColor="#ff9a9e" />
+            <Stop offset="100%" stopColor="#fecfef" />
           </LinearGradient>
           <LinearGradient id="skinGradient" x1="0%" y1="0%" x2="0%" y2="100%">
             <Stop offset="0%" stopColor="#fce7d6" />
@@ -109,13 +111,32 @@ const Avatar: React.FC<AvatarProps> = ({ isSpeaking, isThinking, audioLevel = 0 
             <Stop offset="0%" stopColor="#6366f1" />
             <Stop offset="100%" stopColor="#3730a3" />
           </LinearGradient>
+          <LinearGradient id="faceShade" x1="0%" y1="0%" x2="0%" y2="100%">
+            <Stop offset="0%" stopColor="transparent" />
+            <Stop offset="100%" stopColor="rgba(0,0,0,0.05)" />
+          </LinearGradient>
         </Defs>
+
+        {/* Back Hair - Depth Layer 1 */}
+        <Path d="M35 85 Q15 125 35 185 L165 185 Q185 125 165 85 Z" fill="#fecfef" opacity="0.6" />
+
+        {/* Back Hair - Main */}
+        <Path d="M40 80 Q20 120 40 180 L160 180 Q180 120 160 80 Z" fill="url(#hairGradient)" />
 
         {/* Neck */}
         <Rect x="85" y="145" width="30" height="25" rx="5" fill="url(#skinGradient)" />
 
         {/* Face */}
         <Ellipse cx="100" cy="95" rx="55" ry="60" fill="url(#skinGradient)" />
+        <Ellipse cx="100" cy="95" rx="55" ry="60" fill="url(#faceShade)" />
+
+        {/* Bangs */}
+        <Path d="M45 70 Q100 40 155 70 Q130 90 100 85 Q70 90 45 70" fill="url(#hairGradient)" />
+
+        {/* Hair Accessory (Improved) */}
+        <Circle cx="145" cy="75" r="6" fill="#6366f1" />
+        <Path d="M140 70 L150 80 M150 70 L140 80" stroke="white" strokeWidth="1" />
+        <Circle cx="145" cy="75" r="2" fill="white" />
 
         {/* Eyes with Blinking */}
         <Animated.View style={{ opacity: blinkAnim }}>
@@ -125,8 +146,12 @@ const Avatar: React.FC<AvatarProps> = ({ isSpeaking, isThinking, audioLevel = 0 
           <Circle cx="125" cy="88" r="3" fill="white" />
         </Animated.View>
 
+        {/* Eyelashes (Fixed position) */}
+        <Path d="M65 85 Q75 78 85 85" fill="none" stroke="#1a1a2e" strokeWidth="2" strokeLinecap="round" />
+        <Path d="M115 85 Q125 78 135 85" fill="none" stroke="#1a1a2e" strokeWidth="2" strokeLinecap="round" />
+
         {/* Dynamic Mouth (Lip Sync Simulation) */}
-        <Animated.Path
+        <AnimatedPath
           d={isSpeaking ? "M85 125 Q100 140 115 125" : "M88 120 Q100 125 112 120"}
           fill="none"
           stroke="#d4736a"
@@ -151,7 +176,7 @@ const Avatar: React.FC<AvatarProps> = ({ isSpeaking, isThinking, audioLevel = 0 
       )}
       
       <View style={styles.nameTag}>
-        <Animated.Text style={styles.nameText}>ZEED</Animated.Text>
+        <Animated.Text style={styles.nameText}>HIYORI</Animated.Text>
       </View>
     </View>
   );
@@ -183,7 +208,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '800',
     color: '#6366f1',
-    letterSpacing: 4,
+    letterSpacing: 2,
     textTransform: 'uppercase',
   },
 });

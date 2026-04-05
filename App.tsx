@@ -36,7 +36,7 @@ const MainApp: React.FC = () => {
 
   useEffect(() => {
     initializeChat(userName);
-    const welcomeText = `${getGreeting()} ${userName}! 👋✨\n\nأنا زيد، صديقك الرقمي! سعيد جداً بالتحدث معك. كيف يمكنني مساعدتك اليوم؟`;
+    const welcomeText = `${getGreeting()} ${userName}! 👋✨\n\nأنا هيوري، صديقتك الرقمية! سعيدة جداً بالتحدث معك. كيف يمكنني مساعدتك اليوم؟`;
     const welcomeMessage: Message = {
       id: '1',
       text: welcomeText,
