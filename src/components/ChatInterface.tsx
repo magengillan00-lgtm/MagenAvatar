@@ -123,6 +123,13 @@ const MessageBubble: React.FC<{ message: Message }> = ({ message }) => {
     }).start();
   }, []);
 
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('ar-SA', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
   return (
     <Animated.View
       style={[
